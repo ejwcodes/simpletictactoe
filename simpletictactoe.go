@@ -81,19 +81,6 @@ func main() {
 	promptTurn(initBoard(), 0, "", EmptyCoords)
 }
 
-func getCharInput(msg string) string {
-	fmt.Println(msg)
-	var input string
-	_, err := fmt.Scanln(&input)
-
-	if err != nil {
-		if err.Error() != "unexpected newline" {
-			fmt.Println(err)
-		}
-	}
-	return input
-}
-
 func getSettings() {
 	playerCount := getCharInput("Players: (1) or 2")
 
@@ -189,6 +176,7 @@ func promptTurn(board Board, turn int, msg string, lastMove MoveCoordinates) {
 		return
 	}
 
+	// Determine if turn is taken by player(s) or computer
 	if settingsPlayerCount == 2 || (settingsHumanPlayer == player) {
 		getUserInputForTurn(board, turn, player, lastMove)
 	} else {
@@ -228,12 +216,16 @@ func takeComputerTurn(board Board, turn int, player string) {
 	if turn > 8 {
 		log.Fatal("Game should've ended by now...")
 	}
-	fmt.Println("Computer's turn...")
+	fmt.Print("Computer's turn")
+	for x := 0; x < 3; x++ {
+		time.Sleep(300 * time.Millisecond)
+		fmt.Print(".")
+	}
+	fmt.Println()
 	move := 0
 	var coords MoveCoordinates
 	for move == 0 {
 		randomPick := rand.Intn(9) + 1
-		fmt.Println("Checking", randomPick)
 		coords = numToCoord[randomPick]
 		curValue := board[coords.x][coords.y]
 		if curValue == "_" {
@@ -242,7 +234,6 @@ func takeComputerTurn(board Board, turn int, player string) {
 	}
 	board[coords.x][coords.y] = player
 
-	time.Sleep(700 * time.Millisecond)
 	promptTurn(board, turn+1, "", coords)
 }
 
@@ -280,4 +271,18 @@ func CheckForWin(player string, board Board) bool {
 		result = true
 	}
 	return result
+}
+
+// Helper that displays a `msg` and gets user's char input
+func getCharInput(msg string) string {
+	fmt.Println(msg)
+	var input string
+	_, err := fmt.Scanln(&input)
+
+	if err != nil {
+		if err.Error() != "unexpected newline" {
+			fmt.Println(err)
+		}
+	}
+	return input
 }
